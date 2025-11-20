@@ -132,14 +132,14 @@ class TemporalEvaluator:
         return df
 
     def get_gt_label(self, video_name):
-        gt_start = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "start time"].values[0]
-        gt_end = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "end time"].values[0]
+        gt_start = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "Start Time"].values[0]
+        gt_end = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "End Time"].values[0]
         return (gt_start == 0.0) and (gt_end == 0.0)
 
 
     def eval_IoU(self, video_name):
-        normal_gt_start = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "start time"].values[0]
-        normal_gt_end   = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "end time"].values[0]
+        normal_gt_start = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "Start Time"].values[0]
+        normal_gt_end   = self.gt_df.loc[self.gt_df["Video Name"] == video_name, "End Time"].values[0]
         pred_start      = self.pred_df.loc[self.pred_df["Video Name"] == video_name, "start time"].values[0]
         pred_end        = self.pred_df.loc[self.pred_df["Video Name"] == video_name, "end time"].values[0]
 
@@ -159,6 +159,7 @@ class TemporalEvaluator:
             return
 
         iou_scores = []
+        valid_total = 0
         recall_iou = {
             "r@0.3": 0,
             "r@0.5": 0,
@@ -184,6 +185,7 @@ class TemporalEvaluator:
                 recall_iou["r@0.5"] += 1
             if iou >= 0.7:
                 recall_iou["r@0.7"] += 1
+            valid_total += 1
         
         iou_scores = np.array(iou_scores)
         mean_iou = _round(iou_scores.mean())
@@ -200,6 +202,7 @@ class TemporalEvaluator:
 
         # save the results to txt
         with open(self.save_path, "w") as f:
+            f.write(f"Valid Predictions: {valid_total}\n") 
             f.write(f"Mean IoU: {mean_iou}%\n")
             f.write(f"Recall @0.3: {recall_iou['r@0.3']}%\n")
             f.write(f"Recall @0.5: {recall_iou['r@0.5']}%\n")

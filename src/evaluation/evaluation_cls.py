@@ -114,6 +114,7 @@ class CLSEvaluator:
 
         # calculate acc
         binary_acc, cls_acc = [], []
+        valid_total = 0  # <---- NEW
         for index, row in self.gt_df.iterrows():
             video_name = str(row["Video Name"])
             if ".mp4" not in video_name:
@@ -126,6 +127,8 @@ class CLSEvaluator:
                 binary_acc.append(False)
                 cls_acc.append(False)
                 continue
+            
+            valid_total += 1
             pred = pred[0]
             
             # binary acc
@@ -146,8 +149,10 @@ class CLSEvaluator:
 
         # save the results to txt
         with open(self.save_path, "w") as f:
+            f.write(f"Valid Predictions: {valid_total}\n") 
             f.write(f"Binary accuracy: {_round(binary_acc)}%\n")
             f.write(f"CLS accuracy: {_round(cls_acc)}%\n")
+            
         print(f"Evaluation results saved to {self.save_path}\n", "-"*40, "\n")
 
 if __name__ == "__main__":
@@ -158,6 +163,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.save_path is None:
-        save_path = args.pred_path.replace(".csv", "_eval.txt")
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    CLSEvaluator(args.dataset, test_gt_path, args.pred_path, save_path).evaluate()
+        args.save_path = args.pred_path.replace(".csv", "_eval.txt")
+    os.makedirs(os.path.dirname(args.save_path), exist_ok=True)
+    CLSEvaluator(args).evaluate()
