@@ -119,3 +119,7 @@ If you find our VAU-R1 useful in your research, please consider cite our work or
 
 This codebase is built on top of [VideoChat-R1](https://github.com/OpenGVLab/VideoChat-R1), and we thank the authors for their work.
 
+
+## License
+
+CC BY 4.0
